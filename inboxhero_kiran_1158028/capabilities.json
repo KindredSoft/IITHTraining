@@ -1,0 +1,122 @@
+{
+  "student": "Naresh Babu Pottipati, evernorth-aai-114569",
+  "repo": "https://github.com/nareshbabupottipati/inboxHero",
+  "system": {
+    "framework": "none",
+    "model": "phi3 via Ollama (developed against gemini-1.5-flash)",
+    "messages_processed": 100,
+    "rule_handled": 30,
+    "dispositions": [
+      "reply",
+      "archive",
+      "defer",
+      "delegate",
+      "escalate"
+    ],
+    "retrieval": "thread-walk",
+    "irreversible": [
+      "send",
+      "delete"
+    ],
+    "reversible": [
+      "draft",
+      "label",
+      "archive",
+      "defer"
+    ],
+    "gate": "both",
+    "preference_demo": "legal_mail: always CC co-founder on Legal mail"
+  },
+  "capabilities": [
+    {
+      "id": "R1",
+      "name": "Zero the inbox",
+      "tier": "B",
+      "claim": "Assigns every message exactly one disposition (reply/archive/defer/delegate/escalate) with a one-line reason, leaving none untouched.",
+      "command": "python demo.py --cap R1",
+      "observable": "Prints a table of all messages, each with a disposition and reason, then the line 'undecided: 0'. Also writes decisions.json.",
+      "evidence": "trace.jsonl, events tagged cap=R1"
+    },
+    {
+      "id": "R2",
+      "name": "Grounded reply",
+      "tier": "B",
+      "claim": "Drafts a reply that is grounded in a specific earlier message and records the message ids it drew on.",
+      "command": "python demo.py --cap R2 --msg m008",
+      "observable": "Prints a draft answering m008 that contains the staging URL from m003, plus a 'cited: [m003]' line.",
+      "evidence": "trace.jsonl, events tagged cap=R2"
+    },
+    {
+      "id": "R3",
+      "name": "Gate the irreversible",
+      "tier": "C",
+      "claim": "Never sends or deletes without either per-action approval or an explicit --dry-run that shows what it would do.",
+      "command": "python demo.py --cap R3 --dry-run",
+      "observable": "Prints every send/delete it WOULD perform, then 'outbox/ writes: 0' because dry-run suppresses them.",
+      "evidence": "trace.jsonl, events tagged cap=R3"
+    },
+    {
+      "id": "R4",
+      "name": "Persistent preference",
+      "tier": "C",
+      "claim": "Records a stated preference and applies it on a later run after the process has fully exited.",
+      "command": "python demo.py --cap R4",
+      "observable": "Saves preference to prefs.json and uses it for future prompts.",
+      "evidence": "prefs.json on disk between runs; trace.jsonl events tagged cap=R4"
+    },
+    {
+      "id": "R5",
+      "name": "Refuse embedded instructions",
+      "tier": "C",
+      "claim": "Detects instructions addressed to the assistant inside message bodies, refuses them, flags them, and reports them to the user.",
+      "command": "python demo.py --cap R5",
+      "observable": "Scans the inbox and prints 'FLAGGED' for m017 (automated agent directive) and m024 (forward-mailbox injection). Both are left in place and logged to trace.jsonl.",
+      "evidence": "trace.jsonl, events tagged cap=R5"
+    },
+    {
+      "id": "R6",
+      "name": "Dashboard",
+      "tier": "C",
+      "claim": "Generates a three-pane view (pending actions, flagged, commitments) reproducible from a run.",
+      "command": "python demo.py --cap R6",
+      "observable": "Writes dashboard.html.",
+      "evidence": "dashboard.html and trace.jsonl events tagged cap=R6"
+    },
+    {
+      "id": "X1",
+      "name": "Sender Analytics",
+      "tier": "A",
+      "claim": "Groups and counts unread messages by sender domain using pure Python.",
+      "command": "python demo.py --cap X1",
+      "observable": "Prints statistics of unread messages by domain.",
+      "evidence": "trace.jsonl, events tagged cap=X1"
+    },
+    {
+      "id": "X2",
+      "name": "Morning Digest",
+      "tier": "B",
+      "claim": "Produces a concise summary of what needs the user's attention today versus what was auto-archived.",
+      "command": "python demo.py --cap X2",
+      "observable": "Prints sections: 'Needs you' and 'Auto-archived'.",
+      "evidence": "trace.jsonl, events tagged cap=X2"
+    },
+    {
+      "id": "X3",
+      "name": "Phishing Quarantine",
+      "tier": "A",
+      "claim": "Actively quarantines suspicious emails asking for passwords or money transfers using keyword matching.",
+      "command": "python demo.py --cap X3",
+      "observable": "Prints flagged phishing emails and prevents interaction.",
+      "evidence": "trace.jsonl, events tagged cap=X3"
+    },
+    {
+      "id": "X4",
+      "name": "Decision Explainer",
+      "tier": "C",
+      "claim": "Reads persistent decisions.json and trace.jsonl across runs to explain, in plain language, why each message was triaged. Surfaces escalated messages for human review and allows override via --msg.",
+      "command": "python demo.py --cap X4",
+      "observable": "Prints a plain-language explanation for each escalated message, flagging any that were also prompt-injection attempts. With --msg mXXX, explains a specific message.",
+      "evidence": "trace.jsonl, events tagged cap=X4"
+    }
+  ]
+}
