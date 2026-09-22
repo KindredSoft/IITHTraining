@@ -5,7 +5,7 @@
     "framework": "none",
     "model": "phi3 via Ollama (developed against gemini-1.5-flash)",
     "messages_processed": 100,
-    "rule_handled": 30,
+    "rule_handled": 10,
     "dispositions": [
       "reply",
       "archive",
