@@ -1,6 +1,6 @@
 {
-  "student": "Naresh Babu Pottipati, evernorth-aai-114569",
-  "repo": "https://github.com/nareshbabupottipati/inboxHero",
+  "student": "Kiran Vyamsani, evernorth-aai-1158028",
+  "repo": "https://github.com/KindredSoft/IITHTraining/inboxHero",
   "system": {
     "framework": "none",
     "model": "phi3 via Ollama (developed against gemini-1.5-flash)",
